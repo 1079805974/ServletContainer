@@ -1,5 +1,8 @@
 package server;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.*;
 import javax.servlet.http.*;
 import java.io.*;
@@ -9,10 +12,10 @@ import java.util.*;
 import static server.Constants.*;
 
 public class Request implements HttpServletRequest {
-
-    private InputStream inputStream = null;
+    Logger logger = LoggerFactory.getLogger(Request.class);
+    private HttpInputStream inputStream = null;
     private String method;
-    private String protocal;
+    private String protocol;
     private String requestURI;
     private String queryString;
     private String requestedSessionId;
@@ -22,41 +25,34 @@ public class Request implements HttpServletRequest {
     private String protocolVersion;
     private String protocolSchema;
     private String connection;
-    private String charsetEncoding = "utf-8";//初始默认的编码方式
+    private String charsetEncoding = "utf-8";
 
-    private Map<String, String> headers = new HashMap<String, String>();
-    private List<Cookie> cookies = new ArrayList<Cookie>();
+    private Map<String, String> headers = new HashMap<>();
+    private List<Cookie> cookies = new ArrayList<>();
     private Map<String, Object> attributes = new HashMap<>();
     private Map<String, String[]> parameters = new HashMap<>();//?后面query中查询的参数
 
     public Request(InputStream inputStream) {
-        this.inputStream = inputStream;
+        this.inputStream = new HttpInputStream(inputStream);
         parse();
     }
 
     public void parse() {
-        readFirstLine();//请求行的解析
+        HttpRequestLine requestLine = inputStream.readRequestLine();
+        this.method = requestLine.getMethod();
+        this.protocol = requestLine.getProtocol();
+        this.requestURI = requestLine.getUri();
+        this.queryString = requestLine.getQueryString();
+        try {
+            parseFirstLine(requestLine.toString());
+            logger.debug(requestLine.toString());
+        } catch (ServletException e) {
+            e.printStackTrace();
+        }
         readMessageHeaders();//消息头的解析
     }
 
-    public void readFirstLine() {
-        StringBuilder stringBuilder = null;
-        int i;
-        try {
-            stringBuilder = new StringBuilder(BUFFER_SIZE);
-            while ((char) (i = inputStream.read()) != '\r') {
-                stringBuilder.append((char) i);
-                //System.out.println("(char)i->"+(char)i);
-            }
-            inputStream.read();//读取掉\n
-            String requestLine = stringBuilder.toString();
-            //System.out.println("requestLine->"+requestLine);
-            parseFirstLine(requestLine);
-        } catch (IOException | ServletException e) {
-            e.printStackTrace();
-            System.out.println("error request line");
-        }
-    }
+
 
     public void parseFirstLine(String firstLine) throws ServletException {
         //System.out.println("firstLine->"+firstLine);
@@ -117,7 +113,7 @@ public class Request implements HttpServletRequest {
         if (protocol == null || protocol.length() == 0) {
             throw new ServletException("missing request protocol");
         }
-        setProtocal(protocol);
+        setProtocol(protocol);
         position = protocol.indexOf("/");
         String schema = protocol.substring(0, position);
         setProtocolSchema(schema);
@@ -247,8 +243,8 @@ public class Request implements HttpServletRequest {
         this.protocolVersion = protocolVersion;
     }
 
-    public void setProtocal(String protocal) {
-        this.protocal = protocal;
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
     }
 
     public void setRequestURI(String uri) {
@@ -375,7 +371,6 @@ public class Request implements HttpServletRequest {
     public String getServletPath() {
         return null;
     }
-
 
 
     public HttpSession getSession(boolean b) {
@@ -547,7 +542,7 @@ public class Request implements HttpServletRequest {
     }
 
     public String getProtocol() {
-        return protocal;
+        return protocol;
     }
 
     public String getScheme() {

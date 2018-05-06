@@ -48,13 +48,11 @@ public class Processor implements Runnable {
             if(request.getRequestURI().contains(".jsp")){
                 String jsp2ClassName = request.getRequestURI().substring(request.getRequestURI().lastIndexOf("/"),request.getRequestURI().length()-4)+"_jsp.class";
                 String fileName = "webroot/servlet"+jsp2ClassName;
-                //System.out.println(fileName);
                 File file  = new File(fileName);
                 if(!file.exists()){
                     parseJsp();
                 }
                 String newRequestUri = request.getRequestURI().substring(0,request.getRequestURI().length()-4)+"_jsp";
-                //System.out.println(newRequestUri);
                 request.setRequestURI(newRequestUri);
                 container.invoke(requestFacade, responseFacade);
             }
@@ -86,7 +84,6 @@ public class Processor implements Runnable {
         ServletParser servletParser = new ServletParser(new File("webroot"+request.getRequestURI()));
         try {
             servletParser.parse();
-            //System.out.println(servletParser.parse());
         }
         catch (Exception e){
             e.printStackTrace();

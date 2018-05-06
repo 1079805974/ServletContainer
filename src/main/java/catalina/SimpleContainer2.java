@@ -89,4 +89,34 @@ private String uri = "";
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void addChild(Container child) {
+
+    }
+
+    @Override
+    public void removeChild(Container child) {
+
+    }
+
+    @Override
+    public Container findChild(String name) {
+        return null;
+    }
+
+    @Override
+    public Container[] findChildren() {
+        return new Container[0];
+    }
+
+    @Override
+    public Loader getLoader() {
+        return null;
+    }
+
+    @Override
+    public void setLoader(Loader loader) {
+
+    }
 }

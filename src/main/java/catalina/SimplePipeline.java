@@ -1,8 +1,8 @@
 package catalina;
 
 
-import server.Request;
-import server.Response;
+import server.RequestFacade;
+import server.ResponseFacade;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
@@ -19,6 +19,11 @@ public class SimplePipeline implements Pipeline {
   protected Container container = null;
   // the array of Valves
   protected Valve valves[] = new Valve[0];
+
+  @Override
+  public Container getContainer() {
+    return null;
+  }
 
   public void setContainer(Container container) {
     this.container = container;
@@ -49,7 +54,12 @@ public class SimplePipeline implements Pipeline {
     return valves;
   }
 
-  public void invoke(Request request, Response response)
+  @Override
+  public Valve getFirst() {
+    return null;
+  }
+
+  public void invoke(RequestFacade request, ResponseFacade response)
     throws IOException, ServletException {
     // Invoke the first Valve in this pipeline for this request
     (new SimplePipelineValveContext()).invokeNext(request, response);
@@ -58,8 +68,6 @@ public class SimplePipeline implements Pipeline {
   public void removeValve(Valve valve) {
   }
 
-  // this class is copied from org.apache.catalina.core.StandardPipeline class's
-  // StandardPipelineValveContext inner class.
   protected class SimplePipelineValveContext implements ValveContext {
 
     protected int stage = 0;
@@ -68,7 +76,7 @@ public class SimplePipeline implements Pipeline {
       return null;
     }
 
-    public void invokeNext(Request request, Response response)
+    public void invokeNext(RequestFacade request, ResponseFacade response)
       throws IOException, ServletException {
       int subscript = stage;
       stage = stage + 1;

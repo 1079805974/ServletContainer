@@ -1,7 +1,7 @@
 package catalina;
 
-import server.Request;
-import server.Response;
+import server.RequestFacade;
+import server.ResponseFacade;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -15,8 +15,8 @@ public class SimpleWrapperValve implements Contained, Valve {
 
 	protected Container container;
 
-	public void invoke(Request request, Response response,
-					   ValveContext valveContext) throws IOException, ServletException {
+	public void invoke(RequestFacade request, ResponseFacade response,
+                       ValveContext valveContext) throws IOException, ServletException {
 
 		Wrapper wrapper = (Wrapper) getContainer();
 		ServletRequest sreq = request;
@@ -32,7 +32,8 @@ public class SimpleWrapperValve implements Contained, Valve {
 		// Allocate a servlet instance to process this request
 		try {
 			servlet = wrapper.allocate();
-			if (hres != null && hreq != null) {
+            servlet.init(null);
+            if (hres != null && hreq != null) {
 				servlet.service(hreq, hres);
 			} else {
 				servlet.service(sreq, sres);

@@ -21,12 +21,12 @@ public class index_jsp extends HttpServlet {
         PrintWriter out = response.getWriter();
         HttpSession session = request.getSession();
 
-        out.println("<h1>My id is:");
+        out.println("<h1>My id is: ");
         out.println("Hello");
         out.println("</h1>");
 
         for (int i = 0; i < 3; i++) {
-            out.println("<div>Loop Test</div>");
+            out.println("\t<div>Loop Test</div>");
         }
 
         out.println("Hello");
@@ -39,12 +39,12 @@ public class index_jsp extends HttpServlet {
         PrintWriter out = response.getWriter();
         HttpSession session = request.getSession();
 
-        out.println("<h1>My id is:");
+        out.println("<h1>My id is: ");
         out.println("Hello");
         out.println("</h1>");
 
         for (int i = 0; i < 3; i++) {
-            out.println("<div>Loop Test</div>");
+            out.println("\t<div>Loop Test</div>");
         }
 
         out.println("Hello");

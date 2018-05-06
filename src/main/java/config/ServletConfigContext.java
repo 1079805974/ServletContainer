@@ -9,7 +9,6 @@ import java.io.*;
 import java.util.ArrayList;
 
 import static server.Constants.CONFIG_LOCATION;
-import static server.Constants.LOCALHOST;
 
 public class ServletConfigContext {
 

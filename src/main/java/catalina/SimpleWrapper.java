@@ -2,15 +2,19 @@ package catalina;
 
 import server.Request;
 import server.RequestFacade;
-import server.Response;
 import server.ResponseFacade;
 
+import javax.naming.directory.DirContext;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 
+
 public class SimpleWrapper implements Wrapper, Pipeline {
+
+    // the servlet instance
     private Servlet instance = null;
     private String servletClass;
     private Loader loader;
@@ -22,97 +26,8 @@ public class SimpleWrapper implements Wrapper, Pipeline {
         pipeline.setBasic(new SimpleWrapperValve());
     }
 
-    public Valve getBasic() {
-        return null;
-    }
-
-    @Override
-    public void setBasic(Valve valve) {
-
-    }
-
     public synchronized void addValve(Valve valve) {
         pipeline.addValve(valve);
-    }
-
-    @Override
-    public Valve[] getValves() {
-        return new Valve[0];
-    }
-
-    @Override
-    public void invoke(Request request, Response response) throws IOException, ServletException {
-
-    }
-
-    @Override
-    public void removeValve(Valve valve) {
-
-    }
-
-    @Override
-    public long getAvailable() {
-        return 0;
-    }
-
-    @Override
-    public void setAvailable(long available) {
-
-    }
-
-    @Override
-    public String getJspFile() {
-        return null;
-    }
-
-    @Override
-    public void setJspFile(String jspFile) {
-
-    }
-
-    @Override
-    public int getLoadOnStartup() {
-        return 0;
-    }
-
-    @Override
-    public void setLoadOnStartup(int value) {
-
-    }
-
-    @Override
-    public String getRunAs() {
-        return null;
-    }
-
-    @Override
-    public void setRunAs(String runAs) {
-
-    }
-
-    @Override
-    public String getServletClass() {
-        return null;
-    }
-
-    @Override
-    public void setServletClass(String servletClass) {
-
-    }
-
-    @Override
-    public boolean isUnavailable() {
-        return false;
-    }
-
-    @Override
-    public void addInitParameter(String name, String value) {
-
-    }
-
-    @Override
-    public void addSecurityReference(String name, String link) {
-
     }
 
     public Servlet allocate() throws ServletException {
@@ -129,56 +44,6 @@ public class SimpleWrapper implements Wrapper, Pipeline {
             }
         }
         return instance;
-    }
-
-    @Override
-    public void deallocate(Servlet servlet) throws ServletException {
-
-    }
-
-    @Override
-    public String findInitParameter(String name) {
-        return null;
-    }
-
-    @Override
-    public String[] findInitParameters() {
-        return new String[0];
-    }
-
-    @Override
-    public String findSecurityReference(String name) {
-        return null;
-    }
-
-    @Override
-    public String[] findSecurityReferences() {
-        return new String[0];
-    }
-
-    @Override
-    public void load() throws ServletException {
-
-    }
-
-    @Override
-    public void removeInitParameter(String name) {
-
-    }
-
-    @Override
-    public void removeSecurityReference(String name) {
-
-    }
-
-    @Override
-    public void unavailable(UnavailableException unavailable) {
-
-    }
-
-    @Override
-    public void unload() throws ServletException {
-
     }
 
     private Servlet loadServlet() throws ServletException {
@@ -233,6 +98,8 @@ public class SimpleWrapper implements Wrapper, Pipeline {
     public Loader getLoader() {
         if (loader != null)
             return (loader);
+        if (parent != null)
+            return (parent.getLoader());
         return (null);
     }
 
@@ -240,8 +107,188 @@ public class SimpleWrapper implements Wrapper, Pipeline {
         this.loader = loader;
     }
 
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Container getParent() {
+        return parent;
+    }
+
+    public void setParent(Container container) {
+        parent = container;
+    }
+
+    public ClassLoader getParentClassLoader() {
+        return null;
+    }
+
+    public void setParentClassLoader(ClassLoader parent) {
+    }
+
+
+    public DirContext getResources() {
+        return null;
+    }
+
+    public void setResources(DirContext resources) {
+    }
+
+    public long getAvailable() {
+        return 0;
+    }
+
+    public void setAvailable(long available) {
+    }
+
+    public String getJspFile() {
+        return null;
+    }
+
+    public void setJspFile(String jspFile) {
+    }
+
+    public int getLoadOnStartup() {
+        return 0;
+    }
+
+    public void setLoadOnStartup(int value) {
+    }
+
+    public String getRunAs() {
+        return null;
+    }
+
+    public void setRunAs(String runAs) {
+    }
+
+    public String getServletClass() {
+        return null;
+    }
+
+    public void setServletClass(String servletClass) {
+        this.servletClass = servletClass;
+    }
+
+    public void invoke(RequestFacade request, ResponseFacade response)
+            throws IOException, ServletException {
+        pipeline.invoke(request, response);
+    }
+
+    public boolean isUnavailable() {
+        return false;
+    }
+
+    public void load() throws ServletException {
+        instance = loadServlet();
+    }
+
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+    }
+
+    public Container findChild(String name) {
+        return null;
+    }
+
+    public Container[] findChildren() {
+        return null;
+    }
+
+
+    public void addInitParameter(String name, String value) {
+    }
+
+
+    public void addSecurityReference(String name, String link) {
+    }
+
+    public void deallocate(Servlet servlet) throws ServletException {
+    }
+
+    public String findInitParameter(String name) {
+        return null;
+    }
+
+    public String[] findInitParameters() {
+        return null;
+    }
+
+    public String findSecurityReference(String name) {
+        return null;
+    }
+
+    public String[] findSecurityReferences() {
+        return null;
+    }
+
+
+
     @Override
-    public void invoke(RequestFacade requestFacade, ResponseFacade responseFacade) throws IOException, ServletException {
+    public void removeInitParameter(String name) {
+
+    }
+
+    public Container map(Request request, boolean update) {
+        return null;
+    }
+
+
+    @Override
+    public void addChild(Container child) {
+
+    }
+
+    public void removeChild(Container child) {
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+    }
+
+    public void removeSecurityReference(String name) {
+    }
+
+    public void unavailable(UnavailableException unavailable) {
+    }
+
+    public void unload() throws ServletException {
+    }
+
+    // method implementations of Pipeline
+    public Valve getBasic() {
+        return pipeline.getBasic();
+    }
+
+    public void setBasic(Valve valve) {
+        pipeline.setBasic(valve);
+    }
+
+    public Valve[] getValves() {
+        return pipeline.getValves();
+    }
+
+    @Override
+    public Valve getFirst() {
+        return null;
+    }
+
+
+    public void removeValve(Valve valve) {
+        pipeline.removeValve(valve);
+    }
+
+    @Override
+    public Container getContainer() {
+        return null;
+    }
+
+    @Override
+    public void setContainer(Container container) {
 
     }
 }
