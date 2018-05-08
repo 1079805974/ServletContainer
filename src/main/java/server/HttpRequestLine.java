@@ -35,6 +35,7 @@ final class HttpRequestLine {
         if (pos > 0) {
             originUri = originUri.substring(0, pos);
         }
+        originUri = originUri.replace('\\','/');
         if (originUri.startsWith("/"))
             uri = originUri;
         else {
@@ -44,7 +45,7 @@ final class HttpRequestLine {
             } else {
                 pos = originUri.indexOf('/');
             }
-            this.uri = originUri.substring(pos);
+            uri = originUri.substring(pos);
         }
         return uri;
     }

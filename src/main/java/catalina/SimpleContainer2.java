@@ -45,10 +45,9 @@ private String uri = "";
             String correspondingServletName = "";
             try {
                 ArrayList<ServletConfig> servletConfigArrayList = ServletConfigContext.getServletConfigArrayList();
-                for (int i = 0; i < servletConfigArrayList.size(); i++) {
-                    //System.out.println("uri->"+uri+" "+"servletConfigUri->"+servletConfigArrayList.get(i).getMappingUri());
-                    if (servletConfigArrayList.get(i).getMappingUri().equals(uri)) {
-                        correspondingServletName = servletConfigArrayList.get(i).getClassName();
+                for (ServletConfig sc:servletConfigArrayList) {
+                    if (sc.getMappingUri().equals(uri)) {
+                        correspondingServletName = sc.getClassName();
                         break;
                     }
                 }

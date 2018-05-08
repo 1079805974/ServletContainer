@@ -1,15 +1,19 @@
 package server;
 
-import jdk.incubator.http.internal.common.HttpHeadersImpl;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class HttpInputStream extends ServletInputStream {
 
     InputStream in;
-
+    public static final Logger logger = LoggerFactory.getLogger(HttpInputStream.class);
     /**
      * CR.
      */
@@ -44,8 +48,11 @@ public class HttpInputStream extends ServletInputStream {
      */
     private static final byte QUESTION = (byte) ':';
 
+    private BufferedReader bufferedReader;
+
     HttpInputStream(InputStream in) {
         this.in = in;
+        this.bufferedReader = new BufferedReader(new InputStreamReader(in));
     }
 
     @Override
@@ -63,7 +70,7 @@ public class HttpInputStream extends ServletInputStream {
             }
             String method = lengthLimitRead(HttpRequestLine.MAX_METHOD_SIZE, SP);
             String originUri = lengthLimitRead(HttpRequestLine.MAX_URI_SIZE, SP);
-            String protocol = lengthLimitRead(HttpRequestLine.MAX_PROTOCOL_SIZE, CR, LF);
+            String protocol = lengthLimitRead(HttpRequestLine.MAX_PROTOCOL_SIZE, LF);
             requestLine.setMethod(method);
             requestLine.setProtocol(protocol);
             requestLine.parseOriginUri(originUri);
@@ -83,28 +90,22 @@ public class HttpInputStream extends ServletInputStream {
             if (length > limit)
                 throw new IOException("too long~");
         }
-        return new String(buffer, 0, length - 1);
-    }
-    private String lengthLimitRead(int limit, byte breakChar1, byte breakChar2) throws IOException {
-        int b = -1, length = 0;
-        char buffer[] = new char[limit];
-        while ((char) b != breakChar1 && (char) b != breakChar2) {
-            b = read();
-            buffer[length] = (char) b;
-            length++;
-            if (length > limit)
-                throw new IOException("too long~");
-        }
-        return new String(buffer, 0, length - 1);
+        return new String(buffer, 0, length - 1).trim();
     }
 
-    public HttpHeader readHeader(){
-        try {
-            String headerName = lengthLimitRead(HttpRequestLine.MAX_PROTOCOL_SIZE, COLON);
-            String headerValue = lengthLimitRead(HttpRequestLine.9, CR, LF);
-        } catch (IOException e) {
-            e.printStackTrace();
+    public HttpHeader readHeader() throws IOException {
+        String headerLine = bufferedReader.readLine().toLowerCase();
+        if (isHeadersEnd(headerLine))
+            return null;
+        String[] ary = headerLine.split(":");
+        if(ary.length!=2){
+            throw new IOException("header is wrong : {"+headerLine+"}");
         }
+        return new HttpHeader(ary[0].trim(), ary[1].trim());
+    }
+
+    private boolean isHeadersEnd(String line){
+        return line.trim().isEmpty();
     }
 
     private boolean isNewLineChar(int b) {

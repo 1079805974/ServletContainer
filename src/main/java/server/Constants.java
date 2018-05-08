@@ -5,7 +5,7 @@ public class Constants {
     public static final int BACKLOG = 20;
     public static int BUFFER_SIZE = 1024;
     public static final String SERVER_NAME = "EUGENE_LIU";
-    public static final String CONFIG_LOCATION = "webroot/configuration/web.json";
+    public static final String CONFIG_LOCATION = "webroot/web.json";
     public static final String LOCALHOST = "localhost";
     public static final String RFC1123_DATE = "EEE, dd MMM yyyy HH:mm:ss zzz";
 

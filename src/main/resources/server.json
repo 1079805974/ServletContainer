@@ -1,0 +1,35 @@
+{
+  "port":8005,
+  "shutdown":"Please Shutdown Tomcat",
+  "service": {
+    "name": "Server1",
+    "className": "SimpleServer",
+    "connector": [
+      {
+        "port": 8080,
+        "protocol": "HTTP/1.1",
+        "redirectPort": 8443,
+        "minProcessors":5,
+        "maxProcessors":10
+      }
+    ],
+    "engine": {
+      "defaultHost": "host1",
+      "host": {
+        "name":"host1",
+        "context": [
+          {
+            "name": "SimpleContext",
+            "path": "/myApp.war",
+            "valve": [
+              {
+                "name": "SimpleValve",
+                "className": "SimpleValve"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

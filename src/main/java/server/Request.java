@@ -39,126 +39,14 @@ public class Request implements HttpServletRequest {
 
     public void parse() {
         HttpRequestLine requestLine = inputStream.readRequestLine();
-        this.method = requestLine.getMethod();
-        this.protocol = requestLine.getProtocol();
-        this.requestURI = requestLine.getUri();
-        this.queryString = requestLine.getQueryString();
-        try {
-            parseFirstLine(requestLine.toString());
-            logger.debug(requestLine.toString());
-        } catch (ServletException e) {
-            e.printStackTrace();
-        }
-        readMessageHeaders();//消息头的解析
+        setMethod(requestLine.getMethod());
+        setProtocol(requestLine.getProtocol());
+        setRequestURI(requestLine.getUri());
+        setQueryString(requestLine.getQueryString());
+        logger.debug(requestLine.toString());
+        readMessageHeaders();
     }
 
-
-
-    public void parseFirstLine(String firstLine) throws ServletException {
-        //System.out.println("firstLine->"+firstLine);
-        if (firstLine == null || firstLine.length() == 0) {
-            return;
-        }
-
-        String[] requestString = firstLine.split(" ");
-        /*=======================method part===================*/
-        String method = requestString[0];
-        if (method == null || method.length() == 0) {
-            return;
-        }
-        if (method == null || method.length() == 0) {
-            throw new ServletException("missing request method");
-        }
-        setMethod(method);
-
-        /*=======================uri part=======================*/
-        String uri = requestString[1];
-        if (uri == null || uri.length() == 0) {
-            return;
-        }
-        if (uri == null || uri.length() == 0) {
-            throw new ServletException("missing request uri");
-        }
-
-        int position = uri.indexOf('?');
-        if (position > 0) {
-            String queryString = uri.substring(position + 1);
-            setQueryString(queryString);
-            parseQueryString(queryString);
-            uri = uri.substring(0, position);
-        }
-
-        String match = ";jsessionid=";
-        position = uri.indexOf(";");
-        if (position >= 0) {
-            String requestSessionId = uri.substring(position + match.length());
-            int position2 = requestSessionId.indexOf(";");
-            if (position2 >= 0) {
-                requestSessionId = requestSessionId.substring(0, position2);
-            }
-            setRequestSessionId(requestSessionId);
-            setRequestedSessionURL(true);
-            uri = uri.substring(0, position);
-        } else {
-            setRequestedSessionURL(false);
-        }
-        String normalizedURI = normalizedUri(uri);
-        if (normalizedURI == null || normalizedURI.length() == 0) {
-            throw new ServletException("invalid uri");
-        }
-        setRequestURI(normalizedURI);
-
-        /*=====================protocol part====================*/
-        String protocol = requestString[2];
-        if (protocol == null || protocol.length() == 0) {
-            throw new ServletException("missing request protocol");
-        }
-        setProtocol(protocol);
-        position = protocol.indexOf("/");
-        String schema = protocol.substring(0, position);
-        setProtocolSchema(schema);
-        String version = protocol.substring(position + 1);
-        setProtocolVersion(version);
-    }
-
-    public void parseQueryString(String queryString) {
-        int location = queryString.indexOf("=");
-        int location2 = queryString.indexOf("&");//not exist  ->  -1
-        boolean hasNextString = false;
-        System.out.println(queryString);
-        while (true) {
-            if (location > 0) {
-                String key, value;
-                if (location2 > 0) {
-                    key = queryString.substring(0, location);
-                    value = queryString.substring(location + 1, location2);
-                    hasNextString = true;
-                } else {
-                    key = queryString.substring(0, location);
-                    value = queryString.substring(location + 1);
-                    hasNextString = false;
-                }
-                String[] values = parameters.get(key);
-                if (values == null) {
-                    values = new String[1];
-                    values[0] = value;
-                    parameters.put(key, values);
-                } else {
-                    values = parameters.get(key);
-                    ArrayList arrayList = new ArrayList(Arrays.asList(values));
-                    arrayList.add(value);
-                    parameters.put(key, (String[]) arrayList.toArray());
-                }
-            }
-            if (hasNextString) {
-                queryString = queryString.substring(location2 + 1);
-                location = queryString.indexOf("=");
-                location2 = queryString.indexOf("&");//not exist  ->  -1
-            } else {
-                break;
-            }
-        }
-    }
 
     public void parseHeaderLine(String headerLine) {
         int position = headerLine.indexOf(":");
@@ -210,19 +98,11 @@ public class Request implements HttpServletRequest {
     }
 
     public void readMessageHeaders() {
-        StringBuilder stringBuilder = null;
         int i;
+        HttpHeader header;
         try {
-            while (true) {
-                stringBuilder = new StringBuilder(BUFFER_SIZE);
-                while ((char) (i = inputStream.read()) != '\r') {
-                    stringBuilder.append((char) i);
-                }
-                inputStream.read();//读取掉剩下的\n
-                String headerLine = stringBuilder.toString();
-                if (headerLine == null || headerLine.length() == 0) {
-                    break;
-                }
+            while ((header = inputStream.readHeader())!=null) {
+                String headerLine = header.toString();
                 parseHeaderLine(headerLine);
             }
         } catch (IOException e) {

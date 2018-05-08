@@ -7,13 +7,12 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Connector {
+public class HttpConnector {
     private ServerSocket serverSocket = null;
     private boolean isStopped = false;
     private Container container;
 
-    public Connector init(Container container){
-        this.container = container;
+    public HttpConnector initialize(){
         return this;
     }
 
