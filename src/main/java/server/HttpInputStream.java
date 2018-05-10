@@ -97,11 +97,11 @@ public class HttpInputStream extends ServletInputStream {
         String headerLine = bufferedReader.readLine().toLowerCase();
         if (isHeadersEnd(headerLine))
             return null;
-        String[] ary = headerLine.split(":");
-        if(ary.length!=2){
+        int pos = headerLine.indexOf(':');
+        if(pos==-1){
             throw new IOException("header is wrong : {"+headerLine+"}");
         }
-        return new HttpHeader(ary[0].trim(), ary[1].trim());
+        return new HttpHeader(headerLine.substring(0,pos).trim(), headerLine.substring(pos+1).trim());
     }
 
     private boolean isHeadersEnd(String line){
